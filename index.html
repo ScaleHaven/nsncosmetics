@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NSN Cosmetics — Dashboard</title>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.7.0/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000;
+    --accent:#ffffff;
+    --accent-2:#bdbdbd;
+    --accent-soft:rgba(255,255,255,0.08);
+    --accent-ink:#000000;
+    --tiktok:#9aa0a6;
+    --color-background-primary:#101010;
+    --color-background-secondary:#1a1a1a;
+    --color-background-tertiary:#2d2d2d;
+    --color-text-primary:#ffffff;
+    --color-text-secondary:#9a9a9a;
+    --color-text-tertiary:#6a6a6a;
+    --color-text-danger:#ff6b6b;
+    --color-text-warning:#ffa502;
+    --color-text-success:#4cd137;
+    --color-background-danger:rgba(255,107,107,0.15);
+    --color-background-warning:rgba(255,165,2,0.15);
+    --color-background-success:rgba(76,209,55,0.15);
+    --color-border-tertiary:#333333;
+    --border-radius-md:8px;
+    --border-radius-lg:12px;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--color-text-primary);font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1040px;margin:0 auto;padding:24px 20px 64px}
+
+  /* header */
+  .brand{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--accent)}
+  .brand-lockup{display:flex;flex-direction:column;gap:6px}
+  .brandname{margin:0;font-family:'Anton',sans-serif;font-weight:400;font-size:32px;letter-spacing:1px;text-transform:uppercase;color:#fff;line-height:1}
+  .brand-lockup .sub{font-size:11px;color:var(--color-text-secondary);letter-spacing:.5px}
+  .status{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--color-text-secondary);background:var(--color-background-tertiary);border:1px solid var(--color-border-tertiary);padding:5px 12px;border-radius:20px;white-space:nowrap}
+  .status .dot{width:7px;height:7px;border-radius:50%;background:var(--color-text-secondary)}
+  .status.live{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .status.live .dot{background:var(--accent-ink)}
+  .status.cached{background:var(--color-background-warning);color:var(--color-text-warning);border-color:transparent}
+  .status.cached .dot{background:var(--color-text-warning)}
+  button{background:var(--color-background-secondary);color:var(--color-text-primary);border:1px solid var(--color-border-tertiary);padding:8px 14px;border-radius:var(--border-radius-md);cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .2s ease,background .2s ease}
+  button:hover{border-color:var(--accent);background:var(--color-background-tertiary)}
+
+  /* tabs - pill group */
+  .tabs{display:flex;gap:4px;margin-bottom:28px;background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:10px;padding:4px;overflow-x:auto}
+  .tab{background:transparent;border:none;border-radius:8px;color:var(--color-text-secondary);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:10px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;transition:all .2s ease}
+  .tab:hover{background:var(--color-background-tertiary);color:var(--color-text-primary)}
+  .tab.active,.tab.active:hover{background:var(--accent);color:var(--accent-ink)}
+
+  /* timeframe range selector */
+  .ranges{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:-12px 0 26px}
+  .ranges .lbl{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--color-text-tertiary);margin-right:4px}
+  .rg{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);color:var(--color-text-secondary);font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;padding:6px 12px;border-radius:7px;cursor:pointer;transition:all .15s ease}
+  .rg:hover{border-color:var(--accent);color:var(--color-text-primary)}
+  .rg.active,.rg.active:hover{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .ranges .rg-note{font-size:11px;color:var(--color-text-secondary);margin-left:auto}
+
+  .view[hidden]{display:none}
+  .row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;gap:12px}
+  .row > div:first-child{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:1px;color:#fff}
+  .h-sec{font-family:'Anton',sans-serif;font-weight:400;font-size:15px;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:16px}
+  .h-sub{font-family:'Inter',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--color-text-primary);margin-bottom:10px}
+  .muted{font-size:11px;color:var(--color-text-secondary)}
+  .rule{border-top:1px solid var(--color-border-tertiary);margin:24px 0}
+
+  .kpis{display:grid;gap:12px;margin-bottom:20px}
+  .kcard{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:12px;padding:18px;transition:border-color .2s ease}
+  .kcard:hover{border-color:var(--accent)}
+  .kcard .lab{font-size:9px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:1.2px;font-weight:700}
+  .kcard .val{font-family:'Anton',sans-serif;font-weight:400;font-size:30px;margin-top:6px;line-height:1.05;color:var(--accent)}
+  .card{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:12px;padding:20px}
+  .tbl-wrap{overflow-x:auto;margin-bottom:20px}
+  table{width:100%;font-size:12px;border-collapse:collapse}
+  thead tr{border-bottom:1px solid var(--color-border-tertiary)}
+  th{text-align:left;padding:10px 10px;color:var(--accent);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+  td{padding:10px 10px;vertical-align:top;color:var(--color-text-primary);border-bottom:1px solid rgba(255,255,255,0.05)}
+  tbody tr:hover td{background:var(--accent-soft)}
+  .r{text-align:right}
+  .c{text-align:center}
+  .pill{display:inline-block;padding:3px 9px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
+  .chart-box{position:relative;width:100%;height:220px;margin-bottom:1rem}
+  a{color:var(--accent)}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+  @media(max-width:700px){ .grid2{grid-template-columns:1fr !important} .kpis{grid-template-columns:repeat(2,1fr) !important} .wrap{padding:16px 14px 48px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="brand">
+  <div class="brand-lockup">
+    <h1 class="brandname">NSN Cosmetics</h1>
+    <div class="sub" id="brandSub">@nsncosmeticsvn · Content performance</div>
+  </div>
+  <span class="status live" id="dataStatus" title="Data source status">
+    <span class="dot"></span>
+    <span id="statusLabel">Loading</span>
+    <span id="statusDetail" style="color:var(--color-text-tertiary)"></span>
+  </span>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Dashboard views">
+  <button class="tab active" id="tab-overview" role="tab" aria-selected="true" onclick="switchView('overview')"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Overview</button>
+  <button class="tab" id="tab-facebook" role="tab" aria-selected="false" onclick="switchView('facebook')"><i class="ti ti-brand-facebook" aria-hidden="true"></i> Facebook</button>
+  <button class="tab" id="tab-tiktok" role="tab" aria-selected="false" onclick="switchView('tiktok')"><i class="ti ti-brand-tiktok" aria-hidden="true"></i> TikTok</button>
+  <button class="tab" id="tab-top" role="tab" aria-selected="false" onclick="switchView('top')"><i class="ti ti-flame" aria-hidden="true"></i> Top Content</button>
+</nav>
+
+<div class="ranges" id="rangeBar" aria-label="Timeframe">
+  <span class="lbl">Timeframe</span>
+  <button class="rg active" data-d="all" onclick="setRange('all')">All</button>
+  <button class="rg" data-d="90" onclick="setRange('90')">90d</button>
+  <button class="rg" data-d="60" onclick="setRange('60')">60d</button>
+  <button class="rg" data-d="30" onclick="setRange('30')">30d</button>
+  <button class="rg" data-d="14" onclick="setRange('14')">14d</button>
+  <button class="rg" data-d="7" onclick="setRange('7')">7d</button>
+  <button class="rg" data-d="1" onclick="setRange('1')">1d</button>
+  <span class="rg-note" id="rangeNote"></span>
+</div>
+
+
+<!-- ============================ OVERVIEW ============================ -->
+<section id="view-overview" class="view">
+  <div class="row">
+    <div style="font-size:18px;font-weight:500;">Content overview</div>
+    <div class="muted" id="ovDate">—</div>
+  </div>
+  <div class="kpis" style="grid-template-columns:repeat(4,1fr);">
+    <div class="kcard"><div class="lab">Total posts</div><div class="val" id="kpiPosts">—</div></div>
+    <div class="kcard"><div class="lab">Total views</div><div class="val" id="kpiViews">—</div></div>
+    <div class="kcard"><div class="lab">Total engagement</div><div class="val" id="kpiEng">—</div></div>
+    <div class="kcard"><div class="lab">Avg eng. rate</div><div class="val" id="kpiER">—</div></div>
+  </div>
+
+  <div class="h-sub">Audience signals</div>
+  <div class="kpis" style="grid-template-columns:repeat(4,1fr);">
+    <div class="kcard"><div class="lab">Content leads</div><div class="val" id="ovLeads">—</div></div>
+    <div class="kcard"><div class="lab">Total likes</div><div class="val" id="ovLikes">—</div></div>
+    <div class="kcard"><div class="lab">Total saves</div><div class="val" id="ovSaves">—</div></div>
+    <div class="kcard"><div class="lab">Total comments</div><div class="val" id="ovComments">—</div></div>
+  </div>
+
+  <div class="rule"></div>
+
+  <div class="h-sec">Platform breakdown</div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Platform</th><th class="r">Posts</th><th class="r">Views</th><th class="r">Likes</th><th class="r">Saves</th><th class="r">Leads</th><th class="r">Eng. rate</th></tr></thead>
+    <tbody id="platformRows"><tr><td colspan="7" class="muted">Loading…</td></tr></tbody>
+  </table>
+  </div>
+
+  <div class="h-sub">Weekly views — Facebook</div>
+  <div class="chart-box" style="height:220px"><canvas id="ovWeekly" role="img" aria-label="Weekly Facebook views">Weekly Facebook views.</canvas></div>
+  <div class="muted">Views are the headline reach metric for short-form content. KPIs above are live from the published sheet.</div>
+</section>
+
+
+<!-- ============================ FACEBOOK ============================ -->
+<section id="view-facebook" class="view" hidden>
+  <div class="row"><div style="font-size:18px;font-weight:500;">Facebook performance</div><div class="muted" id="fbNote">live</div></div>
+  <div class="kpis" style="grid-template-columns:repeat(5,1fr);">
+    <div class="kcard"><div class="lab">Posts</div><div class="val" id="fbPosts">—</div></div>
+    <div class="kcard"><div class="lab">Views</div><div class="val" id="fbViews">—</div></div>
+    <div class="kcard"><div class="lab">Likes</div><div class="val" id="fbLikes">—</div></div>
+    <div class="kcard"><div class="lab">Leads</div><div class="val" id="fbLeads">—</div></div>
+    <div class="kcard"><div class="lab">Avg eng. rate</div><div class="val" id="fbER">—</div></div>
+  </div>
+  <div class="grid2" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:1.5rem;">
+    <div><div class="h-sub">Weekly views</div><div class="chart-box" style="height:200px"><canvas id="fbWeeklyViews" role="img" aria-label="Weekly Facebook views">Weekly views.</canvas></div></div>
+    <div><div class="h-sub">Weekly engagement</div><div class="chart-box" style="height:200px"><canvas id="fbWeeklyEng" role="img" aria-label="Weekly Facebook engagement">Weekly engagement.</canvas></div></div>
+  </div>
+  <div class="rule"></div>
+  <div class="h-sec">Post-type breakdown</div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Post type</th><th class="r">Posts</th><th class="r">Views</th><th class="r">Avg views</th><th class="r">Likes</th><th class="r">Saves</th><th class="r">Leads</th><th class="r">Eng. rate</th></tr></thead>
+    <tbody id="fbTypeRows"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody>
+  </table>
+  </div>
+  <div class="h-sec">Top Facebook posts</div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Link</th><th>Date</th><th>Type</th><th class="r">Views</th><th class="r">Likes</th><th class="r">Saves</th><th class="r">Leads</th><th class="r">Eng. rate</th></tr></thead>
+    <tbody id="fbTopRows"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody>
+  </table>
+  </div>
+</section>
+
+
+<!-- ============================ TIKTOK ============================ -->
+<section id="view-tiktok" class="view" hidden>
+  <div class="row"><div style="font-size:18px;font-weight:500;">TikTok performance</div><div class="muted" id="ttNote">live</div></div>
+  <div class="kpis" style="grid-template-columns:repeat(5,1fr);">
+    <div class="kcard"><div class="lab">Posts</div><div class="val" id="ttPosts">—</div></div>
+    <div class="kcard"><div class="lab">Views</div><div class="val" id="ttViews">—</div></div>
+    <div class="kcard"><div class="lab">Likes</div><div class="val" id="ttLikes">—</div></div>
+    <div class="kcard"><div class="lab">New followers</div><div class="val" id="ttFollowers" style="color:var(--color-text-success)">—</div></div>
+    <div class="kcard"><div class="lab">Avg eng. rate</div><div class="val" id="ttER">—</div></div>
+  </div>
+  <div class="h-sec">TikTok posts</div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Link</th><th>Date</th><th>Type</th><th class="r">Views</th><th class="r">Likes</th><th class="r">Saves</th><th class="r">Followers</th><th class="r">Leads</th><th class="r">Eng. rate</th></tr></thead>
+    <tbody id="ttRows"><tr><td colspan="9" class="muted">Loading…</td></tr></tbody>
+  </table>
+  </div>
+  <div class="muted" id="ttFootnote">TikTok tracking is in its early days — the channel is just ramping. New rows appear here automatically as posts are logged.</div>
+</section>
+
+
+<!-- ============================ TOP CONTENT ============================ -->
+<section id="view-top" class="view" hidden>
+  <div class="row"><div style="font-size:18px;font-weight:500;">Top content</div><div class="muted">Best posts across all platforms · by views</div></div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>#</th><th>Link</th><th>Platform</th><th>Date</th><th>Type</th><th class="r">Views</th><th class="r">Engagement</th><th class="r">Saves</th><th class="r">Eng. rate</th></tr></thead>
+    <tbody id="topRows"><tr><td colspan="9" class="muted">Loading…</td></tr></tbody>
+  </table>
+  </div>
+  <div class="rule"></div>
+  <div class="h-sec">Best post types (by avg views)</div>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Post type</th><th class="r">Posts</th><th class="r">Avg views</th><th class="r">Total views</th><th class="r">Avg eng. rate</th></tr></thead>
+    <tbody id="topTypeRows"><tr><td colspan="5" class="muted">Loading…</td></tr></tbody>
+  </table>
+  </div>
+</section>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<!-- ===================================================================
+     Live data — NSN Cosmetics workbook (published to web as CSV).
+     Each tab is read by its gid: Facebook + TikTok content trackers.
+     =================================================================== -->
+<script>
+const PUB = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQBI9XFXIvBvDesB_G5qTYsNeEUjabT022TVY7c3AnuZq5HS_U-gqxV5pq-c_rHg10SU0FeUopBWhnx/pub?output=csv&gid=';
+const GID = { fb:'1838754020', tiktok:'1301204316' };
+// TikTok tab on. Only 1 post tracked so far — more will be added to the TikTok sheet over time
+// and will appear here automatically. Set to false to hide the TikTok tab entirely.
+const TRACK_TIKTOK = true;
+
+// Cached snapshot shown if the sheet can't be reached (computed from the live sheet, Jun 2026).
+const FALLBACK = {
+  asOf:'Week 21',
+  fb:{ posts:108, views:1515444, likes:9387, comments:882, saves:4410, leads:438, shares:404, eng:15521, fol:0, avgEr:0.69 },
+  tt:{ posts:1, views:3591, likes:39, comments:0, saves:8, leads:0, shares:4, eng:51, fol:8, avgEr:1.42 }
+};
+
+/* ---------- helpers ---------- */
+function parseCSV(text){
+  const rows=[]; let row=[],field='',q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){field+='"';i++;} else q=false; } else field+=c; }
+    else { if(c==='"')q=true; else if(c===','){row.push(field);field='';}
+      else if(c==='\n'){row.push(field);rows.push(row);row=[];field='';}
+      else if(c!=='\r')field+=c; } }
+  if(field.length||row.length){row.push(field);rows.push(row);}
+  return rows;
+}
+const num = v => { const n=parseInt(String(v).replace(/[^0-9-]/g,''),10); return isNaN(n)?0:n; };
+const pct = v => { const n=parseFloat(String(v).replace(/[^0-9.\-]/g,'')); return isNaN(n)?null:n; };
+const fmtK = n => n>=1e6 ? (n/1e6).toFixed(1)+'M' : (n>=1000 ? (n/1000).toFixed(1)+'K' : ''+n);
+const fmtN = n => Number(n||0).toLocaleString('en-US');
+const esc = s => String(s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
+const shortWeek = w => String(w||'').replace(/week\s*/i,'W').replace(/\s+/g,'');
+
+async function fetchCSV(gid){
+  // &_cb=<time> busts intermediate caches so we get the freshest published copy each poll.
+  const res = await fetch(PUB+gid+'&_cb='+Date.now(),{cache:'no-store'});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const t = await res.text();
+  if(/^\s*</.test(t)) throw new Error('not CSV');
+  return t;
+}
+// rows -> array of objects, using the row whose first cell equals headerKey as the header row
+function toObjects(csv, headerKey){
+  const rows = parseCSV(csv);
+  let hi = rows.findIndex(r => r.some(c => c.trim().toLowerCase() === headerKey.toLowerCase()));
+  if(hi<0) hi=0;
+  const header = rows[hi].map(h=>h.trim());
+  const out=[];
+  for(let i=hi+1;i<rows.length;i++){
+    const r=rows[i];
+    if(r.every(c=>c.trim()==='')) continue;
+    const o={}; header.forEach((h,j)=> o[h]=(r[j]||'').trim());
+    out.push(o);
+  }
+  return out;
+}
+function shortLink(u){
+  const s=String(u||''); if(!s) return '';
+  if(/tiktok\.com/.test(s)) return 'Open';
+  if(/facebook\.com\/reel/.test(s)) return 'Open';
+  if(/facebook\.com/.test(s)) return 'Open';
+  return 'Open';
+}
+// Build a clickable "Open" link cell (or — when there's no link).
+function linkCell(u){ return u ? '<a href="'+esc(u)+'" target="_blank" rel="noopener">'+shortLink(u)+' <i class="ti ti-external-link" aria-hidden="true"></i></a>' : '—'; }
+// European date display: the sheet writes M.D (e.g. 3.29) — show it the European way, D.M (29.3).
+function euDate(d){
+  let s=String(d||'').replace(/\s+/g,''); if(!s) return '—';
+  let m=s.match(/^(\d{1,2})\.(\d{1,2})$/);          // M.D -> D.M
+  if(m) return m[2]+'.'+m[1];
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/\d{2,4}$/);      // D/M/Y -> D.M
+  if(m) return parseInt(m[1],10)+'.'+parseInt(m[2],10);
+  return s;
+}
+
+// Parse a sheet date to a real Date so we can filter by day-windows. Sheet stores M.D (year 2026);
+// the lone slash format DD/MM/YYYY is treated European (day first). Returns null if unparseable.
+function parseDate(d){
+  let s=String(d||'').replace(/\s+/g,'');
+  let m=s.match(/^(\d{1,2})\.(\d{1,2})$/);            // M.D
+  if(m) return new Date(2026,(+m[1])-1,(+m[2]));
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);      // D/M/Y
+  if(m){ let y=+m[3]; if(y<100) y+=2000; return new Date(y,(+m[2])-1,(+m[1])); }
+  return null;
+}
+
+/* ---------- parse a platform tab into rows (date forward-filled), then aggregate ---------- */
+function loadPlatform(csv){
+  const objs = toObjects(csv,'Week');
+  const rows=[]; let curWeek='', curDate='';
+  objs.forEach(o=>{
+    const wk=(o['Week']||'').trim(); if(wk) curWeek=wk;
+    const dRaw=(o['Post Date']||'').trim(); if(dRaw) curDate=dRaw;
+    const v=num(o['Views']); if(v<=0) return;
+    const e=pct(o['Engagement Rate']);
+    rows.push({week:curWeek, date:curDate, dt:parseDate(curDate), type:(o['Post Type']||'Other').trim()||'Other',
+      link:o['Post Link']||'', views:v, likes:num(o['Likes']), comments:num(o['Total Comments']),
+      saves:num(o['Saves']), leads:num(o['Leads']), shares:num(o['Shares']), eng:num(o['Engagement']),
+      er:(e!==null&&e>0?e:null), fol:num(o['New Followers'])});
+  });
+  return aggregate(rows);
+}
+
+// Build the totals / per-type / per-week stats for a given set of rows. Re-runnable on any filtered subset.
+function aggregate(rows){
+  const A={posts:0,views:0,likes:0,comments:0,saves:0,leads:0,shares:0,eng:0,fol:0,ers:[],
+           types:{}, weekly:{order:[],map:{}}, rows:rows, lastWeek:''};
+  rows.forEach(r=>{
+    A.posts++; A.views+=r.views; A.likes+=r.likes; A.comments+=r.comments; A.saves+=r.saves;
+    A.leads+=r.leads; A.shares+=r.shares; A.eng+=r.eng; A.fol+=r.fol;
+    if(r.er!==null) A.ers.push(r.er);
+    if(!A.types[r.type]) A.types[r.type]={posts:0,views:0,likes:0,saves:0,leads:0,ers:[]};
+    const T=A.types[r.type]; T.posts++; T.views+=r.views; T.likes+=r.likes; T.saves+=r.saves; T.leads+=r.leads; if(r.er!==null)T.ers.push(r.er);
+    if(r.week){ if(!A.weekly.map[r.week]){A.weekly.map[r.week]={views:0,eng:0};A.weekly.order.push(r.week);} A.weekly.map[r.week].views+=r.views; A.weekly.map[r.week].eng+=r.eng; A.lastWeek=r.week; }
+  });
+  A.avgEr=avg(A.ers);
+  return A;
+}
+
+/* ---------- render ---------- */
+function platformRow(name,icon,color,a){
+  const er = a.ers && a.ers.length ? avg(a.ers).toFixed(2)+'%' : (a.avgEr?a.avgEr.toFixed(2)+'%':'—');
+  return '<tr><td style="font-weight:500"><i class="ti '+icon+'" style="color:'+color+';margin-right:6px" aria-hidden="true"></i>'+name+'</td>'+
+    '<td class="r">'+fmtN(a.posts)+'</td><td class="r">'+fmtN(a.views)+'</td><td class="r">'+fmtN(a.likes)+'</td>'+
+    '<td class="r">'+fmtN(a.saves)+'</td><td class="r">'+fmtN(a.leads)+'</td><td class="r">'+er+'</td></tr>';
+}
+
+function renderOverview(fb, tt){
+  const posts=fb.posts+tt.posts, views=fb.views+tt.views, eng=fb.eng+tt.eng,
+        leads=fb.leads+tt.leads, likes=fb.likes+tt.likes, saves=fb.saves+tt.saves, comments=fb.comments+tt.comments;
+  const allEr=(fb.ers||[]).concat(tt.ers||[]);
+  document.getElementById('kpiPosts').textContent=fmtN(posts);
+  document.getElementById('kpiViews').textContent=fmtK(views);
+  document.getElementById('kpiEng').textContent=fmtK(eng);
+  document.getElementById('kpiER').textContent=(allEr.length?avg(allEr):0).toFixed(2)+'%';
+  document.getElementById('ovLeads').textContent=fmtN(leads);
+  document.getElementById('ovLikes').textContent=fmtN(likes);
+  document.getElementById('ovSaves').textContent=fmtN(saves);
+  document.getElementById('ovComments').textContent=fmtN(comments);
+  document.getElementById('ovDate').textContent='Latest · '+(fb.lastWeek||tt.lastWeek||FALLBACK.asOf);
+  document.getElementById('platformRows').innerHTML =
+    platformRow('Facebook','ti-brand-facebook','#ffffff',fb) +
+    (TRACK_TIKTOK ? platformRow('TikTok','ti-brand-tiktok','var(--tiktok)',tt) : '');
+}
+
+function renderFacebook(fb){
+  document.getElementById('fbPosts').textContent=fmtN(fb.posts);
+  document.getElementById('fbViews').textContent=fmtK(fb.views);
+  document.getElementById('fbLikes').textContent=fmtN(fb.likes);
+  document.getElementById('fbLeads').textContent=fmtN(fb.leads);
+  document.getElementById('fbER').textContent=(fb.ers.length?avg(fb.ers):fb.avgEr||0).toFixed(2)+'%';
+
+  const types=Object.keys(fb.types).map(k=>({type:k,...fb.types[k]})).sort((a,b)=>b.views-a.views);
+  document.getElementById('fbTypeRows').innerHTML = types.length ? types.map((t,i)=>
+    '<tr'+(i===0?' style="background:var(--accent-soft)"':'')+'><td style="font-weight:500">'+esc(t.type)+'</td><td class="r">'+t.posts+
+    '</td><td class="r">'+fmtN(t.views)+'</td><td class="r">'+fmtN(Math.round(t.views/t.posts))+
+    '</td><td class="r">'+fmtN(t.likes)+'</td><td class="r">'+fmtN(t.saves)+'</td><td class="r">'+t.leads+
+    '</td><td class="r">'+(t.ers.length?avg(t.ers).toFixed(2)+'%':'—')+'</td></tr>'
+  ).join('') : '<tr><td colspan="8" class="muted">No posts yet.</td></tr>';
+
+  const top=fb.rows.slice().sort((a,b)=>b.views-a.views).slice(0,10);
+  document.getElementById('fbTopRows').innerHTML = top.length ? top.map(r=>
+    '<tr><td>'+linkCell(r.link)+'</td><td>'+euDate(r.date)+'</td><td>'+esc(r.type)+'</td><td class="r" style="color:var(--accent);font-weight:500">'+fmtN(r.views)+
+    '</td><td class="r">'+fmtN(r.likes)+'</td><td class="r">'+fmtN(r.saves)+'</td><td class="r">'+r.leads+
+    '</td><td class="r">'+(r.er!==null?r.er.toFixed(2)+'%':'—')+'</td></tr>'
+  ).join('') : '<tr><td colspan="8" class="muted">No posts yet.</td></tr>';
+}
+
+function renderTikTok(tt){
+  document.getElementById('ttPosts').textContent=fmtN(tt.posts);
+  document.getElementById('ttViews').textContent=fmtK(tt.views);
+  document.getElementById('ttLikes').textContent=fmtN(tt.likes);
+  document.getElementById('ttFollowers').textContent='+'+fmtN(tt.fol);
+  document.getElementById('ttER').textContent=(tt.ers.length?avg(tt.ers):tt.avgEr||0).toFixed(2)+'%';
+  const rows=tt.rows.slice().sort((a,b)=>b.views-a.views);
+  document.getElementById('ttRows').innerHTML = rows.length ? rows.map(r=>
+    '<tr><td>'+linkCell(r.link)+'</td><td>'+euDate(r.date)+'</td><td>'+esc(r.type)+'</td><td class="r" style="color:var(--tiktok);font-weight:500">'+fmtN(r.views)+
+    '</td><td class="r">'+fmtN(r.likes)+'</td><td class="r">'+fmtN(r.saves)+'</td><td class="r">'+r.fol+'</td><td class="r">'+r.leads+
+    '</td><td class="r">'+(r.er!==null?r.er.toFixed(2)+'%':'—')+'</td></tr>'
+  ).join('') : '<tr><td colspan="9" class="muted">No TikTok posts logged yet.</td></tr>';
+}
+
+function renderTop(fb,tt){
+  const all=[]
+    .concat(fb.rows.map(r=>({...r,plat:'Facebook',color:'#ffffff'})))
+    .concat(tt.rows.map(r=>({...r,plat:'TikTok',color:'var(--tiktok)'})))
+    .sort((a,b)=>b.views-a.views).slice(0,15);
+  document.getElementById('topRows').innerHTML = all.length ? all.map((r,i)=>
+    '<tr><td class="muted">'+(i+1)+'</td><td>'+linkCell(r.link)+'</td><td><span style="color:'+r.color+';font-weight:600">'+r.plat+'</span></td><td>'+euDate(r.date)+
+    '</td><td>'+esc(r.type)+'</td><td class="r" style="color:var(--accent);font-weight:500">'+fmtN(r.views)+
+    '</td><td class="r">'+fmtN(r.eng)+'</td><td class="r">'+fmtN(r.saves)+'</td><td class="r">'+(r.er!==null?r.er.toFixed(2)+'%':'—')+
+    '</td></tr>'
+  ).join('') : '<tr><td colspan="9" class="muted">No content yet.</td></tr>';
+
+  // best post types across both platforms
+  const tmap={};
+  [].concat(fb.rows,tt.rows).forEach(r=>{
+    const t=r.type||'Other'; if(!tmap[t]) tmap[t]={posts:0,views:0,ers:[]};
+    tmap[t].posts++; tmap[t].views+=r.views; if(r.er!==null&&r.er>0) tmap[t].ers.push(r.er);
+  });
+  const types=Object.keys(tmap).map(k=>({type:k,...tmap[k],avgViews:tmap[k].views/tmap[k].posts}))
+    .sort((a,b)=>b.avgViews-a.avgViews);
+  document.getElementById('topTypeRows').innerHTML = types.length ? types.map((t,i)=>
+    '<tr'+(i===0?' style="background:var(--accent-soft)"':'')+'><td style="font-weight:500">'+esc(t.type)+'</td><td class="r">'+t.posts+
+    '</td><td class="r" style="color:var(--accent);font-weight:500">'+fmtN(Math.round(t.avgViews))+'</td><td class="r">'+fmtN(t.views)+
+    '</td><td class="r">'+(t.ers.length?avg(t.ers).toFixed(2)+'%':'—')+'</td></tr>'
+  ).join('') : '<tr><td colspan="5" class="muted">No content yet.</td></tr>';
+}
+
+/* ---------- status + tabs ---------- */
+function setStatus(mode, detail, label){
+  const b=document.getElementById('dataStatus'); b.classList.remove('live','cached'); b.classList.add(mode);
+  document.getElementById('statusLabel').textContent = label||(mode==='live'?'Live':'Cached');
+  document.getElementById('statusDetail').textContent = detail?'· '+detail:'';
+}
+let fbOK=false, ttOK=false, currentView='overview';
+let fbData=null, ttData=null;            // full, unfiltered platform data
+let currentFb=null, currentTt=null;      // data after the active timeframe filter (what's on screen)
+let rangeDays=null;                      // null = all time; else N-day window from the latest post
+const rendered={overview:false,facebook:false,tiktok:false};
+
+/* ---------- timeframe filtering ---------- */
+const DAY=86400000;
+// Reference "now" = the most recent dated post across both platforms (robust when data entry lags).
+function refDate(){
+  let max=null;
+  [fbData,ttData].forEach(p=>{ if(p&&p.rows) p.rows.forEach(r=>{ if(r.dt && (!max||r.dt>max)) max=r.dt; }); });
+  return max;
+}
+function inWindow(r, ref){ return rangeDays===null ? true : (r.dt && r.dt.getTime() > ref.getTime()-rangeDays*DAY); }
+
+// Re-render the whole dashboard for the active timeframe. Called on first load, on each poll, and on range change.
+function applyView(){
+  const ref=refDate();
+  const fbV = (rangeDays===null||!fbData) ? fbData : aggregate(fbData.rows.filter(r=>inWindow(r,ref)));
+  const ttV = (rangeDays===null||!TRACK_TIKTOK||!ttData) ? ttData : aggregate(ttData.rows.filter(r=>inWindow(r,ref)));
+  currentFb=fbV; currentTt=ttV;
+
+  renderOverview(fbV, ttV);
+  renderFacebook(fbV);
+  if(TRACK_TIKTOK) renderTikTok(ttV);
+  renderTop(fbV, ttV);
+
+  // redraw the visible chart; reset the others so they redraw fresh when next opened
+  rendered.overview=false; rendered.facebook=false;
+  if(currentView==='facebook'){ renderFacebookCharts(fbV); rendered.facebook=true; }
+  else if(currentView==='overview'){ renderOverviewChart(fbV); rendered.overview=true; }
+
+  // window label, e.g. "24.5 – 23.6 · 28 posts"
+  const note=document.getElementById('rangeNote');
+  if(note){
+    if(rangeDays===null || !ref){ note.textContent=''; }
+    else{
+      const lo=new Date(ref.getTime()-(rangeDays-1)*DAY);
+      const ds=x=>x.getDate()+'.'+(x.getMonth()+1);
+      const n=(fbV?fbV.posts:0)+(ttV&&TRACK_TIKTOK?ttV.posts:0);
+      note.textContent=ds(lo)+' – '+ds(ref)+' · '+n+' post'+(n===1?'':'s');
+    }
+  }
+}
+function setRange(v){
+  rangeDays = (v==='all') ? null : +v;
+  document.querySelectorAll('#rangeBar .rg').forEach(b=>b.classList.toggle('active', b.dataset.d===v));
+  applyView();
+}
+
+let lastUpdated='';
+function viewStatus(){
+  const ok = fbOK || ttOK;
+  const wk = (fbData&&fbData.lastWeek) || FALLBACK.asOf;
+  setStatus(ok?'live':'cached', ok?(wk+(lastUpdated?' · upd '+lastUpdated:'')):'Snapshot', ok?'Live':'Cached');
+}
+function switchView(name){
+  currentView=name;
+  ['overview','facebook','tiktok','top'].forEach(v=>{
+    document.getElementById('view-'+v).hidden=(v!==name);
+    const t=document.getElementById('tab-'+v); t.classList.toggle('active',v===name); t.setAttribute('aria-selected',v===name?'true':'false');
+  });
+  document.getElementById('brandSub').textContent = '@nsncosmeticsvn · Content performance';
+  viewStatus();
+  if(name==='overview'&&!rendered.overview&&currentFb){ renderOverviewChart(currentFb); rendered.overview=true; }
+  if(name==='facebook'&&!rendered.facebook&&currentFb){ renderFacebookCharts(currentFb); rendered.facebook=true; }
+}
+
+/* ---------- charts ---------- */
+const gridColor='rgba(255,255,255,0.08)', textColor='rgba(255,255,255,0.7)';
+let ovChart,fbViewsChart,fbEngChart;
+function weeklySeries(d){
+  const labels=d.weekly.order.map(shortWeek);
+  return { labels, views:d.weekly.order.map(w=>d.weekly.map[w].views), eng:d.weekly.order.map(w=>d.weekly.map[w].eng) };
+}
+function renderOverviewChart(d){
+  if(ovChart)ovChart.destroy();
+  const s=weeklySeries(d);
+  ovChart=new Chart(document.getElementById('ovWeekly'),{type:'bar',
+    data:{labels:s.labels,datasets:[{label:'Views',data:s.views,
+      backgroundColor:ctx=>ctx.dataIndex>=s.views.length-4?'#ffffff':'#6a6a6a',borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:11},callback:v=>v>=1000?(v/1000)+'k':v}},x:{grid:{display:false},ticks:{color:textColor,font:{size:10},autoSkip:true,maxRotation:0}}}}});
+}
+function renderFacebookCharts(d){
+  if(fbViewsChart)fbViewsChart.destroy(); if(fbEngChart)fbEngChart.destroy();
+  const s=weeklySeries(d);
+  fbViewsChart=new Chart(document.getElementById('fbWeeklyViews'),{type:'bar',
+    data:{labels:s.labels,datasets:[{label:'Views',data:s.views,backgroundColor:'#ffffff',borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:11},callback:v=>v>=1000?(v/1000)+'k':v}},x:{grid:{display:false},ticks:{color:textColor,font:{size:10},autoSkip:true,maxRotation:0}}}}});
+  fbEngChart=new Chart(document.getElementById('fbWeeklyEng'),{type:'line',
+    data:{labels:s.labels,datasets:[{label:'Engagement',data:s.eng,borderColor:'#ffffff',backgroundColor:'rgba(255,255,255,0.10)',fill:true,tension:0.3,pointRadius:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{grid:{color:gridColor},ticks:{color:textColor,font:{size:11}}},x:{grid:{display:false},ticks:{color:textColor,font:{size:10},autoSkip:true,maxRotation:0}}}}});
+}
+
+/* ---------- boot ---------- */
+function fallbackPlatform(f){ return {posts:f.posts,views:f.views,likes:f.likes,comments:f.comments,saves:f.saves,leads:f.leads,shares:f.shares,eng:f.eng,fol:f.fol,ers:[],avgEr:f.avgEr,types:{},weekly:{order:[],map:{}},rows:[],lastWeek:FALLBACK.asOf}; }
+function emptyPlatform(){ return {posts:0,views:0,likes:0,comments:0,saves:0,leads:0,shares:0,eng:0,fol:0,ers:[],avgEr:0,types:{},weekly:{order:[],map:{}},rows:[],lastWeek:''}; }
+
+// How often the open dashboard checks the sheet for new data. It only re-draws when something
+// actually changed, so polling often is cheap. (Google caches the published feed a few minutes,
+// so a freshly typed value lands within ~1-5 min — that lag is Google's, not ours.)
+const REFRESH_SECONDS = 60;
+let lastRaw = {}, firstLoad = true;
+
+async function loadData(){
+  // 1) Pull raw CSV for each tab. A failed poll keeps the last good data instead of wiping it.
+  let fbCsv=null, ttCsv=null;
+  try{ fbCsv=await fetchCSV(GID.fb); }catch(e){ console.warn('Facebook fetch failed:',e.message); }
+  if(TRACK_TIKTOK){ try{ ttCsv=await fetchCSV(GID.tiktok); }catch(e){ console.warn('TikTok fetch failed:',e.message); } }
+
+  // 2) Did anything actually change since last poll?
+  let changed=false;
+  if(fbCsv!==null && fbCsv!==lastRaw.fb){ changed=true; lastRaw.fb=fbCsv; }
+  if(ttCsv!==null && ttCsv!==lastRaw.tt){ changed=true; lastRaw.tt=ttCsv; }
+  if(!changed && !firstLoad) return; // nothing new — leave the dashboard exactly as it is
+
+  // 3) Rebuild from whatever we successfully fetched (fall back only when we have nothing).
+  if(fbCsv!==null){ fbData=loadPlatform(fbCsv); fbOK=true; document.getElementById('fbNote').textContent='live'; }
+  else if(!fbData){ fbData=fallbackPlatform(FALLBACK.fb); document.getElementById('fbNote').textContent='snapshot (fetch failed)'; }
+
+  if(TRACK_TIKTOK){
+    if(ttCsv!==null){ ttData=loadPlatform(ttCsv); ttOK=true; document.getElementById('ttNote').textContent='live'; }
+    else if(!ttData){ ttData=fallbackPlatform(FALLBACK.tt); document.getElementById('ttNote').textContent='snapshot (fetch failed)'; }
+    renderTikTok(ttData);
+  } else {
+    ttData=emptyPlatform();
+    document.getElementById('tab-tiktok').style.display='none';
+    document.getElementById('view-tiktok').hidden=true;
+  }
+
+  applyView();   // renders everything through the active timeframe filter
+
+  lastUpdated = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  firstLoad = false;
+  viewStatus();
+}
+
+async function boot(){
+  await loadData();
+  setInterval(loadData, REFRESH_SECONDS*1000);
+}
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
